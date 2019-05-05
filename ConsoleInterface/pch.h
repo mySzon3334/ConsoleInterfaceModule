@@ -10,5 +10,12 @@
 #define PCH_H
 
 // TODO: w tym miejscu dodaj nagłówki, które mają być wstępnie kompilowane
+/*#include <iostream>
+#include <Windows.h>  // system("")
+#include <vector>
+//#include <bits/stdc++.h> 
+#include <string>
+#include <conio.h> // _getch()
+#include "ConsoleColor.h" // coloring cout output*/
 
 #endif //PCH_H
