@@ -1,11 +1,11 @@
-﻿#include <iostream>
-/*#include <Windows.h>		// system("")
+#pragma once
+#include <iostream>
+#include <Windows.h>		// system("")
 #include <vector>			// vectors
-#include <string>			// strings*/
-#include "test_header.h"
-#include "pch.h"
-using namespace std;
-/*
+#include <string>			// strings
+#include <conio.h>			// _getch()
+#include "ConsoleColor.h"	// coloring cout output
+
 using namespace std;
 
 // VARIABLE DECLARATION
@@ -15,7 +15,7 @@ string header[5] = { "	               .__                               ",
 					 "	\\ \\/ \\/ // __ \\|  | _/ ___\\/  _ \\ /     \\_/ __ \\ ",
 					 "	 \\     /\\  ___/|  |_\\  \\__(  <_> )  Y Y  \\  ___/ ",
 					 "	  \\/\\_/  \\_____>____/\\_____>____/|__|_|__/\\_____>" };
-				//	 "	             \/          \/            \/     \/ "}
+
 int position, line, input;
 vector<int> history;
 bool running;
@@ -25,8 +25,8 @@ namespace cst
 	string deafult_string_value = "Null";
 	int selection_mode = 0;					// 0 - w/s arrow, 1 - numbers
 	int back_key = 32;						// ascii of key to move back, deafult is 32 (space), set to 0 to turn it off
-	int up_key = 119;
-	int down_key = 115;
+	int up_key = 119;						// ascii of key to move up, default id 119 (w)
+	int down_key = 115;						// ascii of key to move up, default id 115 (s)
 	int select_key = 13;					// ascii of key to select, deafult is 13 (enter)
 	string pointer_string = "--> ";			// string that will be used as an arrow to point in selection_mode = 0
 	string true_string = "    True";		// string that will be used when bool varible object is true
@@ -43,7 +43,7 @@ public:
 	bool bool_value = false;
 	vector<int> choices;
 	int color = 0;											// 0 - white, 1 - blue, 2 - red, 3 - green, 4 - yellow
-	int behavior = 0;	// what object do when selected: 0 - jump to submenu, 1 - nothing, 2 - open input box, 3 - change bool state;
+	int behavior = 0;	// what object do when selected: 0 - jump to submenu, 1 - nothing, 2 - open input box, 3 - change bool state
 						// 4 - go back, 5 - exit app
 	string support_varible; // varible that sometimes class use, used to hold additional class information
 
@@ -56,27 +56,13 @@ public:
 		return choices[index];
 	}
 	void set_name(string a) { name = a; }
-	void set_value(int a) { value = a; }
+	void set_value(string a) { value = a; }
 	void set_color(int a) { color = a; }
 	void set_behavior(int a) { behavior = a; }
 	void set_support_var(string a) { support_varible = a; }	// it will be displayed only in input box or at the top of submenu
 };
 
-class VaribleBox {
-public:
-	string name, value;
-	void set_name(string varible) { name = varible; }
-	void set_value(string varible) { value = varible; }*/
-
-/*class Header {// for every new line in header write "endl" in single cell and "color_blue" for colored text.
-public:
-	vector<string>;
-};
-
-
 vector<Submenu> all;
-//vector<VaribleBox> varbox;
-
 
 int displayHeader()
 {
@@ -173,7 +159,11 @@ int input_handling(int inp)	// takes ascii input as argument
 				all[all[position].choices[temp]].bool_value = false;
 			break;
 		case 4:
-			go_back();
+			if(history.size() > 1)
+				go_back();
+			break;
+		case 5:
+			running = false;
 			break;
 		}
 	}
@@ -186,11 +176,9 @@ int input_handling(int inp)	// takes ascii input as argument
 
 int display()
 {
+	cout << all[position].support_varible << endl << endl;
 	int i;
 	for (i = 0; i < all[position].choices.size(); i++)		// size of vector in class
-			//if (all[position][i] != -1)
-			//if(1000 <= all[position].choices[i] && all[position].choices[i] < 2000 )
-										// if for clickable - for later use
 	{
 		if (i == line && cst::selection_mode == 0)
 			cout << cst::pointer_string;
@@ -224,95 +212,21 @@ int display()
 	return 0;
 }
 
+int module_init()				// run this at the top of your cpp source file
+{
+	position = 0;
+	history.push_back(position);
+	line = 0;
+	running = true;
+	return 0;
+}
+
 int tick()
 {
 	system("cls");
 	displayHeader();
 	display();
-		input = _getch();
-		input_handling(input);
+	input = _getch();
+	input_handling(input);
 	return 0;
 }
-int create_obj(string name, string value = "Null", int color = 0, int behavior = 0, string description = "")
-{	// this function will create object of Submenu and add it to 'all' vector | function returns index in 'all' of new object
-	string temp, temp2;
-	temp2 = to_string(all.size());
-	temp = "obj" + temp2;
-	Submenu temp;
-	temp.set_name(name)
-	return 0;
-}*/
-
-int main()
-{	
-	cout << "11" << endl;
-	/*Submenu mainmenu;
-	Submenu menu1;
-	Submenu menu2;
-	Submenu menu3;
-	Submenu menu4;
-	Submenu menu5;
-	Submenu varbox;
-	mainmenu.set_name("main");
-	mainmenu.set_support_var("to nie dziala");
-	menu1.set_name("temp1");
-	menu1.set_support_var("tutaj bedzie opis");
-	menu1.set_color(2);
-	menu2.set_name("temp2");
-	menu2.set_behavior(2);
-	menu2.set_support_var("enter text here: ");
-	menu3.set_name("temp3");
-	menu3.set_behavior(3);
-	menu4.set_name("submenu1");
-	menu5.set_name("submenu2");
-	varbox.set_name("varible: ");
-	varbox.set_value(2);
-	varbox.set_color(4);
-
-	mainmenu.add_choice(1);
-	mainmenu.add_choice(2);
-	mainmenu.add_choice(3);
-	menu1.add_choice(4);
-	menu1.add_choice(5);
-	menu1.add_choice(6);
-	all.push_back(mainmenu);
-	all.push_back(menu1);	
-	all.push_back(menu2);
-	all.push_back(menu3);
-	all.push_back(menu4);
-	all.push_back(menu5);
-	all.push_back(varbox);
-	
-	//string inp2;
-
-	/*for (int i = 0; i < 4; i++)
-	{
-		cout << all[i].name << endl;
-		for (auto m : all[i].choices)
-		{
-			cout << all[m].name << endl;
-		}
-	}
-	cout << mainmenu.choices[0];
-	int inp;
-	inp = 0;
-	int max_rows, i, j;
-	string err_note;
-	err_note = "";
-	
-	history.push_back(0);
-	int inp;
-	position = 0;
-	line = 0;
-	running = true;
-	while (running)
-	{
-		tick();
-	}
- 
- */
-}
-
-
-
-
