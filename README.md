@@ -15,4 +15,5 @@ Contact - szymonromanko8@gmail.com
 
 
 ConsoleInterfaceModule is using additional module called ConsoleColor.h
+
 ConsoleColor.h was created by Vincent Godin
