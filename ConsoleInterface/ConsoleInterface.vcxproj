@@ -153,6 +153,7 @@
   <ItemGroup>
     <ClInclude Include="ConsoleColor.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="ConsoleInterfaceModule.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="demo_app.cpp" />

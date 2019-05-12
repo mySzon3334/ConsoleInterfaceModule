@@ -10,19 +10,17 @@ using namespace std;
 
 // VARIABLE DECLARATION
 
-string header[5] = { "	               .__                               ",
-					 "	__  _  __ ____ |  |   ____  ____   _____   ____  ",
-					 "	\\ \\/ \\/ // __ \\|  | _/ ___\\/  _ \\ /     \\_/ __ \\ ",
-					 "	 \\     /\\  ___/|  |_\\  \\__(  <_> )  Y Y  \\  ___/ ",
-					 "	  \\/\\_/  \\_____>____/\\_____>____/|__|_|__/\\_____>" };
+vector<string> header;
 
-int position, line, input;
+int position, line, input, last_clicked;
 vector<int> history;
+vector<string> head_message;
 bool running;
 
-namespace cst
+namespace sttg
 {
-	string deafult_string_value = "Null";
+	int logs = 2;							// logging to file, 0 - off,  1 - only init,  2 - on,  3 - full  ( view docs for more info )
+	string deafult_string_value = "Null";	// don't touch it, if values aren't displayed correctly change it to some big number or random string
 	int selection_mode = 0;					// 0 - w/s arrow, 1 - numbers
 	int back_key = 32;						// ascii of key to move back, deafult is 32 (space), set to 0 to turn it off
 	int up_key = 119;						// ascii of key to move up, default id 119 (w)
@@ -34,12 +32,13 @@ namespace cst
 	string pre_value = ":  ";				// string that will be displayed between obj name and obj value
 	int color_true = 4;						// color for true_string
 	int color_false = 3;					// color for false_string
+	int color_header = 2;
 }
 
 class Submenu {
 public:
 	string name;
-	string value = cst::deafult_string_value;
+	string value = sttg::deafult_string_value;
 	bool bool_value = false;
 	vector<int> choices;
 	int color = 0;											// 0 - white, 1 - blue, 2 - red, 3 - green, 4 - yellow
@@ -64,14 +63,23 @@ public:
 
 vector<Submenu> all;
 
-int displayHeader()
+void log(int log_type, string log_msg)
 {
-	int i;
-	for (i = 0; i < 5; i++)
+	if (log_type <= sttg::logs)
 	{
-		cout << yellow << header[i] << white << endl;
+		string temp, temp2, temp3;
+		temp = "echo ";
+		temp2 = " >> cim_logs.txt";
+		temp3 = temp + log_msg + temp2;
+		const char * c = temp3.c_str();
+		system(c);
 	}
-	return 0;
+}
+
+int clear_log()
+{
+	system("del cim_logs.txt");
+	system("echo logs cleared >> cim_logs.txt");
 }
 
 int getPosition()
@@ -81,12 +89,14 @@ int getPosition()
 
 void go_back()
 {
+	log(2, "moved back");
 	history.pop_back();
 	position = history[history.size() - 1];
 }
 
 void close()
 {
+	log(2, "closing.");
 	running = false;
 }
 
@@ -115,30 +125,48 @@ int set_color(int color)
 	return 0;
 }
 
+int displayHeader()
+{
+	int i;
+	set_color(sttg::color_header);
+	for (i = 0; i < header.size(); i++)
+	{
+		cout << header[i] << endl;
+	}
+	cout << white;
+	return 0;
+}
+
 int input_handling(int inp)	// takes ascii input as argument
 {
+	log(3, "input recived");
 	int temp;
 
-	if (cst::selection_mode == 0)
+	if (sttg::selection_mode == 0)
 	{
-		if (inp == cst::up_key && line > 0)
+		if (inp == sttg::up_key && line > 0)
 			line--;
-		if (inp == cst::down_key && line < (all[position].choices.size() - 1))
+		if (inp == sttg::down_key && line < (all[position].choices.size() - 1))
 			line++;
 	}
 
-	if (inp == cst::select_key && cst::selection_mode == 0 || 48 < inp && inp < 58 && cst::selection_mode == 1)
+	if (inp == sttg::select_key && sttg::selection_mode == 0 || 48 < inp && inp < 58 && sttg::selection_mode == 1)
 	{
-		if (cst::selection_mode == 0)
+		if (sttg::selection_mode == 0)
 			temp = line;
-		if (cst::selection_mode == 1)
+		if (sttg::selection_mode == 1)
 			temp = inp - 48 - 1;
+
+		last_clicked = all[position].choices[temp];
 
 		switch (all[all[position].choices[temp]].behavior)
 		{
 		case 0:
 			if (all[all[position].choices[temp]].choices.size() > 0)
 			{
+				string temp2;
+				temp2 = to_string(position);
+				log(2, "moved to " + temp2);
 				position = all[position].choices[temp];
 				history.push_back(position);
 			}
@@ -153,6 +181,7 @@ int input_handling(int inp)	// takes ascii input as argument
 			system("cls");
 			break;
 		case 3:
+			log(2, "chaned bool state");
 			if (all[all[position].choices[temp]].bool_value == false)
 				all[all[position].choices[temp]].bool_value = true;
 			else
@@ -163,11 +192,11 @@ int input_handling(int inp)	// takes ascii input as argument
 				go_back();
 			break;
 		case 5:
-			running = false;
+			close();
 			break;
 		}
 	}
-	if (cst::back_key != 0 && inp == cst::back_key && history.size() > 1)
+	if (sttg::back_key != 0 && inp == sttg::back_key && history.size() > 1)
 	{
 		go_back();
 	}
@@ -178,31 +207,35 @@ int display()
 {
 	cout << all[position].support_varible << endl << endl;
 	int i;
+	for (i = 0; i < head_message.size(); i++)
+	{
+		cout << head_message[i] << endl;
+	}
 	for (i = 0; i < all[position].choices.size(); i++)		// size of vector in class
 	{
-		if (i == line && cst::selection_mode == 0)
-			cout << cst::pointer_string;
+		if (i == line && sttg::selection_mode == 0)
+			cout << sttg::pointer_string;
 
 		set_color(all[all[position].choices[i]].color);
 
-		if (cst::selection_mode == 1)
+		if (sttg::selection_mode == 1)
 			cout << i + 1 << ".  ";
 		cout << all[all[position].choices[i]].name;
-		if (all[all[position].choices[i]].value != cst::deafult_string_value)	// check if value is != then deafult_string_value
-			cout << cst::pre_value << all[all[position].choices[i]].value << white << endl;
+		if (all[all[position].choices[i]].value != sttg::deafult_string_value)	// check if value is != then deafult_string_value
+			cout << sttg::pre_value << all[all[position].choices[i]].value << white << endl;
 		else
 		{
 			if (all[all[position].choices[i]].behavior == 3)
 			{
 				if (all[all[position].choices[i]].bool_value == true)
 				{
-					set_color(cst::color_true);
-					cout << cst::true_string << white << endl;
+					set_color(sttg::color_true);
+					cout << sttg::true_string << white << endl;
 				}
 				else
 				{
-					set_color(cst::color_false);
-					cout << cst::false_string << white << endl;
+					set_color(sttg::color_false);
+					cout << sttg::false_string << white << endl;
 				}
 			}
 			else
@@ -214,6 +247,11 @@ int display()
 
 int module_init()				// run this at the top of your cpp source file
 {
+	string temp;
+	temp = to_string(sttg::logs);
+	log(1, "starting console_interface_module");
+	log(1, "logs are set to " + temp);
+	header.push_back("");
 	position = 0;
 	history.push_back(position);
 	line = 0;

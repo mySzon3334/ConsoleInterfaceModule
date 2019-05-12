@@ -1,0 +1,4 @@
+Submenu name1;
+name1.set_name("menu1");
+name1.set_behavior(1);
+all.push_back(name1);
